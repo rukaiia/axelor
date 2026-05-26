@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views
+    xmlns="http://axelor.com/xml/ns/object-views"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+        https://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+
+
+    <grid name="currency-rate-grid"
+          title="Курсы валют"
+          model="com.example.currency.db.CurrencyRate"
+          orderBy="-rateDate,code"
+          editable="false">
+
+        <toolbar>
+            <button name="btnFetch"
+                    title="Загрузить с НБКР"
+                    icon="fa-refresh"
+                    onClick="action-currency-rate-fetch"/>
+        </toolbar>
+
+        <field name="rateDate" title="Дата"         width="120"/>
+        <field name="code"     title="Код"          width="80"/>
+        <field name="name"     title="Наименование" width="220"/>
+        <field name="nominal"  title="Номинал"      width="90"/>
+        <field name="rate"     title="Курс (KGS)"   x-scale="4" width="140"/>
+    </grid>
+
+
+    <form name="currency-rate-form"
+          title="Курс валюты"
+          model="com.example.currency.db.CurrencyRate">
+
+        <toolbar>
+            <button name="btnFetch"
+                    title="Загрузить с НБКР"
+                    icon="fa-refresh"
+                    onClick="action-currency-rate-fetch"/>
+        </toolbar>
+
+        <panel title="Данные курса">
+            <field name="rateDate" title="Дата курса"   required="true"  cols="4"/>
+            <field name="code"     title="Код ISO"      required="true"  cols="4"/>
+            <field name="nominal"  title="Номинал"      required="true"  cols="4"/>
+            <field name="name"     title="Наименование" required="true"  colSpan="8"/>
+            <field name="rate"     title="Курс к KGS"   required="true"  x-scale="6" cols="4"/>
+        </panel>
+    </form>
+
+
+    <action-view name="action-currency-rate-all"
+                 title="Курсы валют"
+                 model="com.example.currency.db.CurrencyRate">
+        <view type="grid" name="currency-rate-grid"/>
+        <view type="form" name="currency-rate-form"/>
+    </action-view>
+
+
+    <action-method name="action-currency-rate-fetch">
+        <call class="com.example.currency.web.CurrencyRateController"
+              method="fetchRates"/>
+    </action-method>
+
+
+    <menuitem name="menu-currency"
+              title="Валюты"
+              icon="fa-money"
+              order="200"/>
+
+    <menuitem name="menu-currency-rates"
+              title="Курсы валют"
+              parent="menu-currency"
+              action="action-currency-rate-all"
+              order="10"/>
+
+</object-views>

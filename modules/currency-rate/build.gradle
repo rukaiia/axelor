@@ -1,0 +1,11 @@
+apply plugin: 'com.axelor.app'
+
+axelor {
+    title = 'Currency Rates NBKR'
+    description = 'Daily currency rates from National Bank of Kyrgyz Republic'
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:1.18.30"
+    annotationProcessor "org.projectlombok:lombok:1.18.30"
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models
+    xmlns="http://axelor.com/xml/ns/domain-models"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+        https://axelor.com/xml/ns/domain-models/domain-models_5.4.xsd">
+
+    <module name="currency" package="com.example.currency.db"/>
+
+
+    <entity name="CurrencyRate">
+
+        <string  name="code"     title="Код валюты"   required="true" max="10"/>
+        <string  name="name"     title="Наименование" required="true" max="100"/>
+        <integer name="nominal"  title="Номинал"      required="true"/>
+        <decimal name="rate"     title="Курс к KGS"   required="true" precision="20" scale="6"/>
+        <date    name="rateDate" title="Дата курса"   required="true"/>
+
+        <unique-constraint columns="code,rateDate"/>
+
+    </entity>
+
+</domain-models>

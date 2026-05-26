@@ -1,0 +1,2 @@
+name,job,cron,active
+Загрузка курсов НБКР,com.example.currency.job.CurrencyRateFetchJob,"0 0 9 * * ?",true
