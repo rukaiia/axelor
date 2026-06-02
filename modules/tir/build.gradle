@@ -1,8 +1,8 @@
 apply plugin: 'com.axelor.app'
 
 axelor {
-    title = 'Currency Rates NBKR'
-    description = 'Daily currency rates from National Bank of Kyrgyz Republic'
+    title = 'TIR Exchange Service'
+    description = 'TIR EPD message exchange service'
 }
 
 dependencies {

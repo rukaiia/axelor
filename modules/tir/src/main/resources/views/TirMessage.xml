@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views
+    xmlns="http://axelor.com/xml/ns/object-views"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+        https://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+
+    <grid name="tir-message-grid"
+          title="TIR Сообщения"
+          model="com.example.tir.db.TirMessage"
+          orderBy="-createdAt"
+          editable="false">
+
+        <field name="createdAt" title="Дата" width="160"/>
+        <field name="messageType" title="Тип" width="100"/>
+        <field name="guaranteeNumber" title="Номер гарантии" width="150"/>
+        <field name="iruReference" title="Референс IRU" width="150"/>
+        <field name="customsIndex" title="Таможенный индекс" width="150"/>
+        <field name="status" title="Статус" width="120"/>
+    </grid>
+
+    <form name="tir-message-form"
+          title="TIR Сообщение"
+          model="com.example.tir.db.TirMessage">
+
+        <panel title="Основные данные">
+            <field name="createdAt" title="Дата создания" cols="4"/>
+            <field name="messageType" title="Тип сообщения" cols="4"/>
+            <field name="status" title="Статус" cols="4"/>
+            <field name="guaranteeNumber" title="Номер гарантии" cols="4"/>
+            <field name="iruReference" title="Референс IRU" cols="4"/>
+            <field name="customsIndex" title="Таможенный индекс" cols="4"/>
+        </panel>
+
+        <panel title="XML Payload">
+            <field name="payload" title="XML" colSpan="12"/>
+        </panel>
+    </form>
+
+    <action-view name="action-tir-message-all"
+                 title="TIR Сообщения"
+                 model="com.example.tir.db.TirMessage">
+        <view type="grid" name="tir-message-grid"/>
+        <view type="form" name="tir-message-form"/>
+    </action-view>
+
+    <menuitem name="menu-tir"
+              title="МДП (TIR)"
+              icon="fa-exchange"
+              order="300"/>
+
+    <menuitem name="menu-tir-messages"
+              title="История сообщений"
+              parent="menu-tir"
+              action="action-tir-message-all"
+              order="10"/>
+
+</object-views>
