@@ -14,6 +14,7 @@
         <string name="customsIndex" title="Таможенный индекс" max="50"/>
         <string name="status" title="Статус" required="true" max="20"/>
         <string name="payload" title="XML payload" large="true"/>
+        <string name="response" title="XML ответ" large="true"/>
         <datetime name="createdAt" title="Дата создания"/>
     </entity>
 

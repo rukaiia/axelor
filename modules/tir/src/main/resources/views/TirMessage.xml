@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <object-views
-    xmlns="http://axelor.com/xml/ns/object-views"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+        xmlns="http://axelor.com/xml/ns/object-views"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://axelor.com/xml/ns/object-views
         https://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
 
     <grid name="tir-message-grid"
@@ -35,6 +35,11 @@
         <panel title="XML Payload">
             <field name="payload" title="XML" colSpan="12"/>
         </panel>
+
+        <panel title="XML Response">
+            <field name="response" title="Ответ" colSpan="12"/>
+        </panel>
+
     </form>
 
     <action-view name="action-tir-message-all"

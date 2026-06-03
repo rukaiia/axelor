@@ -64,7 +64,7 @@ public class TirExchangeService {
             response = XmlParser.buildSoapFault("PROCESSING_ERROR", e.getMessage());
             status = "ERROR";
         }
-        saveMessage(xmlPayload, messageType, status);
+        saveMessage(xmlPayload, messageType, status, response);
         log.info("Сообщение {} обработано со статусом {}", messageType, status);
         return response;
     }
@@ -73,7 +73,7 @@ public class TirExchangeService {
         return messageRepository.findAllSorted();
     }
 
-    private void saveMessage(String xmlPayload, String messageType, String status) {
+    private void saveMessage(String xmlPayload, String messageType, String status, String response) {
         try {
             Document doc = XmlParser.parse(xmlPayload);
             TirMessage message = new TirMessage();
@@ -83,8 +83,8 @@ public class TirExchangeService {
             message.setCustomsIndex(XmlParser.getTagValue(doc, "CustomsIndex"));
             message.setStatus(status);
             message.setPayload(xmlPayload);
+            message.setResponse(response);
             message.setCreatedAt(LocalDateTime.now());
-
             messageRepository.save(message);
         } catch (Exception e) {
             log.error("Ошибка при сохранении сообщения: {}", e.getMessage());

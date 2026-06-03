@@ -32,4 +32,21 @@ public class TirExchangeController {
             response.setError("Ошибка: " + e.getMessage());
         }
     }
+
+    public void exchangeFromUi(ActionRequest request, ActionResponse response) {
+        log.info("TIR exchange из UI");
+        try {
+            String xmlPayload = (String) request.getContext().get("payload");
+            if (xmlPayload == null || xmlPayload.isEmpty()) {
+                response.setError("Введите XML сообщение");
+                return;
+            }
+            String result = tirExchangeService.exchange(xmlPayload);
+            response.setValue("response", result);
+            response.setInfo("Сообщение обработано");
+        } catch (Exception e) {
+            log.error("Ошибка", e);
+            response.setError("Ошибка: " + e.getMessage());
+        }
+    }
 }
