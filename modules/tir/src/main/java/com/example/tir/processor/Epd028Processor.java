@@ -15,6 +15,14 @@ public class Epd028Processor implements TirMessageProcessor {
         Document doc = XmlParser.parse(xmlPayload);
 
         String guaranteeNumber = XmlParser.getTagValue(doc, "GuaranteeNumber");
+        if (guaranteeNumber == null || guaranteeNumber.isEmpty()) {
+            return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
+                    "Отсутствует элемент GuaranteeNumber");
+        }
+        if (!guaranteeNumber.matches("^[A-Z]{2}\\d+$")) {
+            return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
+                    "Неверный формат номера гарантии: " + guaranteeNumber);
+        }
         String customsIndex = XmlParser.getTagValue(doc, "CustomsIndex");
 
         if (guaranteeNumber == null || guaranteeNumber.isEmpty()) {

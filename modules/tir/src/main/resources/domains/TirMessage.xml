@@ -15,6 +15,9 @@
         <string name="status" title="Статус" required="true" max="20"/>
         <string name="payload" title="XML payload" large="true"/>
         <string name="response" title="XML ответ" large="true"/>
+        <string name="iruRef" title="Референс IRU" max="50"/>
+        <string name="holderNum" title="Номер держателя" max="50"/>
+        <string name="inputMessageType" title="Тип сообщения" max="20"/>
         <datetime name="createdAt" title="Дата создания"/>
     </entity>
 

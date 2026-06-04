@@ -19,6 +19,14 @@ public class Epd016Processor implements TirMessageProcessor {
             return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
                     "Отсутствует элемент GuaranteeNumber");
         }
+        if (!guaranteeNumber.matches("^[A-Z]{2}\\d+$")) {
+            return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
+                    "Неверный формат номера гарантии: " + guaranteeNumber);
+        }
+        if (guaranteeNumber == null || guaranteeNumber.isEmpty()) {
+            return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
+                    "Отсутствует элемент GuaranteeNumber");
+        }
         return "<EPD016_ACK>" +
                 "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
                 "<Status>REJECTION_ACKNOWLEDGED</Status>" +

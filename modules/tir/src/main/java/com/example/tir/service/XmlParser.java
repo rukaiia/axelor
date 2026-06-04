@@ -22,6 +22,7 @@ public class XmlParser {
             if (!cleanXml.startsWith("<")) {
                 throw new RuntimeException("Некорректный формат XML");
             }
+
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();

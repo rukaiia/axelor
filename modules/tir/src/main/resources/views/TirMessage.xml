@@ -98,5 +98,56 @@
               parent="menu-tir"
               action="action-tir-exchange-form"
               order="5"/>
+    <selection name="tir.message.type.select">
+        <option value="EPD015">EPD015</option>
+        <option value="EPD028">EPD028</option>
+        <option value="EPD029">EPD029</option>
+        <option value="EPD045">EPD045</option>
+        <option value="EPD051">EPD051</option>
+    </selection>
+
+    <form name="tir-simple-form"
+          title="Быстрая отправка"
+          model="com.example.tir.db.TirMessage">
+
+        <toolbar>
+            <button name="btnSend"
+                    title="Отправить"
+                    icon="fa-paper-plane"
+                    onClick="action-tir-simple"/>
+        </toolbar>
+
+        <panel title="Параметры запроса">
+            <field name="messageType" title="Тип сообщения" colSpan="4"
+                   selection="tir.message.type.select"/>
+            <field name="guaranteeNumber" title="Номер гарантии" colSpan="4"/>
+            <field name="iruReference" title="Референс IRU" colSpan="4"/>
+            <field name="customsIndex" title="Таможенный индекс" colSpan="4"/>
+        </panel>
+
+        <panel title="Ответ">
+            <field name="response" title="XML ответ" colSpan="12" widget="text" readonly="true"/>
+        </panel>
+
+    </form>
+
+    <action-method name="action-tir-simple">
+        <call class="com.example.tir.web.TirExchangeController"
+              method="sendSimple"/>
+    </action-method>
+
+    <action-view name="action-tir-simple-form"
+                 title="Быстрая отправка"
+                 model="com.example.tir.db.TirMessage">
+        <view type="form" name="tir-simple-form"/>
+    </action-view>
+
+    <menuitem name="menu-tir-simple"
+              title="Быстрая отправка"
+              parent="menu-tir"
+              action="action-tir-simple-form"
+              order="3"/>
 
 </object-views>
+
+

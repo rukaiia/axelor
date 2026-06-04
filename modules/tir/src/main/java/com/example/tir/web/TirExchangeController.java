@@ -49,4 +49,47 @@ public class TirExchangeController {
             response.setError("Ошибка: " + e.getMessage());
         }
     }
+    public void sendSimple(ActionRequest request, ActionResponse response) {
+        log.info("TIR простая отправка из UI");
+        try {
+            String messageType = (String) request.getContext().get("messageType");
+            String guaranteeNumber = (String) request.getContext().get("guaranteeNumber");
+            String iruReference = (String) request.getContext().get("iruReference");
+            String customsIndex = (String) request.getContext().get("customsIndex");
+
+            if (messageType == null || messageType.isEmpty()) {
+                response.setError("Выберите тип сообщения");
+                return;
+            }
+            if (guaranteeNumber == null || guaranteeNumber.isEmpty()) {
+                response.setError("Введите номер гарантии");
+                return;
+            }
+
+            String xml;
+            if ("EPD015".equals(messageType)) {
+                xml = "<EPD015>" +
+                        "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                        "<IruReference>" + (iruReference != null ? iruReference : "") + "</IruReference>" +
+                        "<HolderNumber>TIRH-000000</HolderNumber>" +
+                        "</EPD015>";
+            } else if ("EPD028".equals(messageType)) {
+                xml = "<EPD028>" +
+                        "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                        "<CustomsIndex>" + (customsIndex != null ? customsIndex : "") + "</CustomsIndex>" +
+                        "</EPD028>";
+            } else {
+                xml = "<" + messageType + ">" +
+                        "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                        "</" + messageType + ">";
+            }
+
+            String result = tirExchangeService.exchange(xml);
+            response.setValue("response", result);
+            response.setInfo("Сообщение обработано");
+        } catch (Exception e) {
+            log.error("Ошибка", e);
+            response.setError("Ошибка: " + e.getMessage());
+        }
+    }
 }
