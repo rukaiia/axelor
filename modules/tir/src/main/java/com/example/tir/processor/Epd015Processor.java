@@ -19,31 +19,34 @@ public class Epd015Processor implements TirMessageProcessor {
         String holderNumber = XmlParser.getTagValue(doc, "HolderNumber");
         if (guaranteeNumber == null || guaranteeNumber.isEmpty()) {
             return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
-                "Отсутствует элемент GuaranteeNumber");
+                    "Отсутствует элемент GuaranteeNumber");
         }
         if (holderNumber == null || holderNumber.isEmpty()) {
             return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
-                "Отсутствует элемент HolderNumber");
+                    "Отсутствует элемент HolderNumber");
         }
         if (guaranteeNumber.startsWith("XX")) {
             log.info("[EPD015] Гарантия {} — отказ EPD016", guaranteeNumber);
             return "<EPD016>" +
-                   "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
-                   "<IruReference>" + iruReference + "</IruReference>" +
-                   "<Status>REJECTED</Status>" +
-                   "<Reason>Гарантия отклонена</Reason>" +
-                   "</EPD016>";
+                    "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                    "<IruReference>" + iruReference + "</IruReference>" +
+                    "<Status>REJECTED</Status>" +
+                    "<Reason>Гарантия отклонена</Reason>" +
+                    "</EPD016>";
+        } else if (guaranteeNumber.startsWith("KG")) {
+            String customsIndex = "CI-" + guaranteeNumber + "-" + System.currentTimeMillis() % 10000;
+            log.info("[EPD015] Гарантия {} — одобрено, индекс {}", guaranteeNumber, customsIndex);
+            return "<EPD028>" +
+                    "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                    "<IruReference>" + iruReference + "</IruReference>" +
+                    "<CustomsIndex>" + customsIndex + "</CustomsIndex>" +
+                    "<Status>ACCEPTED</Status>" +
+                    "</EPD028>";
+        } else {
+            log.warn("[EPD015] Неверный формат гарантии: {}", guaranteeNumber);
+            return XmlParser.buildSoapFault("CLIENT_VALIDATION_ERROR",
+                    "Неверный формат номера гарантии: " + guaranteeNumber);
         }
-
-        String customsIndex = "CI-" + guaranteeNumber + "-" + System.currentTimeMillis() % 10000;
-        log.info("[EPD015] Гарантия {} — одобрено, индекс {}", guaranteeNumber, customsIndex);
-
-        return "<EPD028>" +
-               "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
-               "<IruReference>" + iruReference + "</IruReference>" +
-               "<CustomsIndex>" + customsIndex + "</CustomsIndex>" +
-               "<Status>ACCEPTED</Status>" +
-               "</EPD028>";
     }
 }
 

@@ -60,4 +60,43 @@
               action="action-tir-message-all"
               order="10"/>
 
+    <form name="tir-exchange-form"
+          title="Отправить TIR сообщение"
+          model="com.example.tir.db.TirMessage"
+          onSave="action-tir-exchange">
+
+        <toolbar>
+            <button name="btnExchange"
+                    title="Отправить"
+                    icon="fa-paper-plane"
+                    onClick="action-tir-exchange"/>
+        </toolbar>
+
+        <panel title="Запрос">
+            <field name="payload" title="XML сообщение" colSpan="12" widget="text"/>
+        </panel>
+
+        <panel title="Ответ">
+            <field name="response" title="XML ответ" colSpan="12" widget="text" readonly="true"/>
+        </panel>
+
+    </form>
+
+    <action-method name="action-tir-exchange">
+        <call class="com.example.tir.web.TirExchangeController"
+              method="exchangeFromUi"/>
+    </action-method>
+
+    <action-view name="action-tir-exchange-form"
+                 title="Отправить сообщение"
+                 model="com.example.tir.db.TirMessage">
+        <view type="form" name="tir-exchange-form"/>
+    </action-view>
+
+    <menuitem name="menu-tir-exchange"
+              title="Отправить сообщение"
+              parent="menu-tir"
+              action="action-tir-exchange-form"
+              order="5"/>
+
 </object-views>

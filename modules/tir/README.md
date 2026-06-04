@@ -39,8 +39,86 @@ POST http://localhost:8080/axelor-erp/ws/action
 Content-Type: application/json
 ```
 
-**Гарантия KG — должен вернуть EPD028:**
+# TIR Exchange — модуль для Axelor ERP
 
+Модуль имитирует обмен сообщениями МДП (TIR-EPD) между таможней и IRU.
+
+## Запуск
+
+```
+.\gradlew run
+```
+
+Открыть в браузере: `http://localhost:8080/axelor-erp`
+
+---
+
+## Тестирование через интерфейс
+
+Открыть в браузере **МДП (TIR) → Отправить сообщение**.
+
+Вставить XML в поле и нажать кнопку **Отправить**. Ответ появится в поле ниже.
+
+**Гарантия KG — вернёт EPD028:**
+```
+<EPD015><GuaranteeNumber>KG12345678</GuaranteeNumber><IruReference>IRU-2025-001</IruReference><HolderNumber>TIRH-998877</HolderNumber></EPD015>
+```
+
+**Гарантия XX — вернёт EPD016 (отказ):**
+```
+<EPD015><GuaranteeNumber>XX99999999</GuaranteeNumber><IruReference>IRU-2025-002</IruReference><HolderNumber>TIRH-998877</HolderNumber></EPD015>
+```
+
+**Нет HolderNumber — вернёт SOAP Fault:**
+```
+<EPD015><GuaranteeNumber>KG12345678</GuaranteeNumber><IruReference>IRU-2025-003</IruReference></EPD015>
+```
+
+**EPD028 → вернёт EPD029:**
+```
+<EPD028><GuaranteeNumber>KG12345678</GuaranteeNumber><CustomsIndex>CI-KG12345678-755</CustomsIndex></EPD028>
+```
+
+**EPD045:**
+```
+<EPD045><GuaranteeNumber>KG12345678</GuaranteeNumber></EPD045>
+```
+
+**EPD051:**
+```
+<EPD051><GuaranteeNumber>KG12345678</GuaranteeNumber></EPD051>
+```
+
+История обработанных сообщений: **МДП (TIR) → История сообщений**
+
+---
+
+## Тестирование через Postman
+
+### 1. Войти в систему
+
+```
+POST http://localhost:8080/axelor-erp/callback
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+```
+
+После этого Postman сохранит куки — остальные запросы отправлять в том же окне.
+
+### 2. Отправить TIR сообщение
+
+Все запросы идут сюда:
+
+```
+POST http://localhost:8080/axelor-erp/ws/action
+Content-Type: application/json
+```
+
+**Гарантия KG → EPD028:**
 ```json
 {
   "action": "com.example.tir.web.TirExchangeController:exchange",
@@ -53,8 +131,7 @@ Content-Type: application/json
 }
 ```
 
-**Гарантия XX — должен вернуть EPD016 (отказ):**
-
+**Гарантия XX → EPD016:**
 ```json
 {
   "action": "com.example.tir.web.TirExchangeController:exchange",
@@ -67,8 +144,7 @@ Content-Type: application/json
 }
 ```
 
-**Нет HolderNumber — должен вернуть SOAP Fault:**
-
+**Нет HolderNumber → SOAP Fault:**
 ```json
 {
   "action": "com.example.tir.web.TirExchangeController:exchange",
@@ -81,8 +157,7 @@ Content-Type: application/json
 }
 ```
 
-**EPD028:**
-
+**EPD028 → EPD029:**
 ```json
 {
   "action": "com.example.tir.web.TirExchangeController:exchange",
@@ -96,7 +171,6 @@ Content-Type: application/json
 ```
 
 **EPD045:**
-
 ```json
 {
   "action": "com.example.tir.web.TirExchangeController:exchange",
@@ -110,7 +184,6 @@ Content-Type: application/json
 ```
 
 **EPD051:**
-
 ```json
 {
   "action": "com.example.tir.web.TirExchangeController:exchange",
@@ -122,8 +195,6 @@ Content-Type: application/json
   }
 }
 ```
-
----
 
 ### 3. История сообщений
 
