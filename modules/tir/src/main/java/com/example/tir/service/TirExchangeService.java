@@ -46,6 +46,17 @@ public class TirExchangeService {
                     "Невалидный XML: " + e.getMessage());
         }
         log.info("Тип сообщения: {}", messageType);
+        String guaranteeNumber = XmlParser.getTagValue(XmlParser.parse(xmlPayload), "GuaranteeNumber");
+        if (guaranteeNumber != null && guaranteeNumber.startsWith("XX") && !"EPD015".equals(messageType)) {
+            log.info("Гарантия XX — принудительный отказ EPD016");
+            String iruReference = XmlParser.getTagValue(XmlParser.parse(xmlPayload), "IruReference");
+            return "<EPD016>" +
+                    "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                    "<IruReference>" + (iruReference != null ? iruReference : "") + "</IruReference>" +
+                    "<Status>REJECTED</Status>" +
+                    "<Reason>Гарантия отклонена</Reason>" +
+                    "</EPD016>";
+        }
         TirMessageProcessor processor = processors.get(messageType);
         if (processor == null) {
             log.warn("Неизвестный тип сообщения: {}", messageType);

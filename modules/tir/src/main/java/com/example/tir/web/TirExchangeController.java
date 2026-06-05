@@ -65,6 +65,21 @@ public class TirExchangeController {
                 response.setError("Введите номер гарантии");
                 return;
             }
+            if (!guaranteeNumber.matches("^[A-Z]{2}\\d+$")) {
+                response.setError("Неверный формат номера гарантии. Пример: KG12345678");
+                return;
+            }
+            if (guaranteeNumber.startsWith("XX")) {
+                String xml = "<EPD015>" +
+                        "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
+                        "<IruReference>" + (iruReference != null ? iruReference : "") + "</IruReference>" +
+                        "<HolderNumber>TIRH-000000</HolderNumber>" +
+                        "</EPD015>";
+                String result = tirExchangeService.exchange(xml);
+                response.setValue("response", result);
+                response.setInfo("Сообщение обработано");
+                return;
+            }
 
             String xml;
             if ("EPD015".equals(messageType)) {
@@ -74,22 +89,30 @@ public class TirExchangeController {
                         "<HolderNumber>TIRH-000000</HolderNumber>" +
                         "</EPD015>";
             } else if ("EPD028".equals(messageType)) {
+                if (customsIndex == null || customsIndex.isEmpty()) {
+                    response.setError("Для EPD028 необходимо указать таможенный индекс");
+                    return;
+                }
                 xml = "<EPD028>" +
                         "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
-                        "<CustomsIndex>" + (customsIndex != null ? customsIndex : "") + "</CustomsIndex>" +
+                        "<CustomsIndex>" + customsIndex + "</CustomsIndex>" +
                         "</EPD028>";
             } else {
                 xml = "<" + messageType + ">" +
                         "<GuaranteeNumber>" + guaranteeNumber + "</GuaranteeNumber>" +
                         "</" + messageType + ">";
             }
-
             String result = tirExchangeService.exchange(xml);
             response.setValue("response", result);
             response.setInfo("Сообщение обработано");
-        } catch (Exception e) {
-            log.error("Ошибка", e);
-            response.setError("Ошибка: " + e.getMessage());
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Ошибка валидации: {}", e.getMessage());
+            response.setError("Ошибка валидации: " + e.getMessage());
+        }
+        catch (Exception e) {
+            log.error("Ошибка при обработке сообщения", e);
+            response.setError("Произошла ошибка при обработке. Проверьте данные и попробуйте снова.");
         }
     }
 }
