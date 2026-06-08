@@ -30,24 +30,32 @@ public class InventorySheetService {
     public void saveInventoryLine(Context context, ActionResponse response) {
         Long id = (Long) context.get("id");
 
-
-
         BigDecimal plannedQty = toBigDecimal(context.get("plannedQty"));
         BigDecimal actualQty = toBigDecimal(context.get("actualQty"));
         BigDecimal unitCost = toBigDecimal(context.get("unitCost"));
-
-        if (unitCost.compareTo(BigDecimal.ZERO) == 0) {
-            log.info("Пропуск сохранения — unitCost равен нулю");
+        if (unitCost.compareTo(BigDecimal.ZERO) == 0
+                || plannedQty.compareTo(BigDecimal.ZERO) == 0
+                || actualQty.compareTo(BigDecimal.ZERO) == 0) {
+            log.info("Пропуск сохранения — не все поля заполнены");
             return;
         }
 
         InventorySheetLine line;
         if (id != null) {
             line = lineRepo.find(id);
-            if (line == null) {
-                line = new InventorySheetLine();
-            }
+            if (line == null) line = new InventorySheetLine();
         } else {
+            Long sheetId = getSheetId(context);
+            if (sheetId != null) {
+                InventorySheetLine existing = lineRepo.all()
+                        .filter("self.sheet.id = ?1 AND self.plannedQty = ?2 AND self.actualQty = ?3 AND self.unitCost = ?4",
+                                sheetId, plannedQty, actualQty, unitCost)
+                        .fetchOne();
+                if (existing != null) {
+                    log.info("Пропуск — строка с такими данными уже существует");
+                    return;
+                }
+            }
             line = new InventorySheetLine();
         }
 
@@ -70,22 +78,21 @@ public class InventorySheetService {
         }
 
         line.setArticleNumber((String) context.get("articleNumber"));
-        line.setProductName((String) context.get("productName"));
-        line.setUnit((String) context.get("unit"));
-        line.setNote((String) context.get("note"));
+         line.setProductName((String) context.get("productName"));
+         line.setUnit((String) context.get("unit"));
+         line.setNote((String) context.get("note"));
 
         BigDecimal variance = actualQty.subtract(plannedQty);
         BigDecimal varianceAmount = variance.multiply(unitCost).setScale(2, RoundingMode.HALF_UP);
 
         line.setPlannedQty(plannedQty);
         line.setActualQty(actualQty);
-        line.setUnitCost(unitCost);
+         line.setUnitCost(unitCost);
         line.setVariance(variance);
         line.setVarianceAmount(varianceAmount);
 
         lineRepo.save(line);
         log.info("Сохранена строка ведомости id={}, отклонение={}", line.getId(), variance);
-
         response.setValue("variance", variance);
         response.setValue("varianceAmount", varianceAmount);
 
@@ -94,6 +101,15 @@ public class InventorySheetService {
         } else {
             log.warn("sheet == null, totalVariance не обновляется.");
         }
+    }
+
+    private Long getSheetId(Context context) {
+        Context parentContext = context.getParent();
+        if (parentContext == null) return null;
+
+         if (parentContext.get("id") != null) return Long.valueOf(parentContext.get("id").toString());
+        if (parentContext.get("_id") != null) return Long.valueOf(parentContext.get("_id").toString());
+        return null;
     }
 
     private void updateSheetTotalVariance(InventorySheet sheet) {
@@ -116,7 +132,7 @@ public class InventorySheetService {
 
     private BigDecimal toBigDecimal(Object value) {
         if (value == null) return BigDecimal.ZERO;
-        if (value instanceof BigDecimal) return (BigDecimal) value;
+         if (value instanceof BigDecimal) return (BigDecimal) value;
         try {
             return new BigDecimal(value.toString());
         } catch (NumberFormatException e) {
