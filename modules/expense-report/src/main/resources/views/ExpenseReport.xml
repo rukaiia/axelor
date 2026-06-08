@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views
+        xmlns="http://axelor.com/xml/ns/object-views"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+        https://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+
+    <grid name="expense-report-grid"
+          title="Авансовые отчёты"
+          model="com.example.expense.db.ExpenseReport"
+          orderBy="-reportDate">
+        <field name="reportNumber" title="Номер"/>
+        <field name="reportDate" title="Дата"/>
+        <field name="employeeName" title="Сотрудник"/>
+        <field name="department" title="Отдел"/>
+        <field name="advanceAmount" title="Аванс"/>
+        <field name="totalExpense" title="Расходы"/>
+        <field name="difference" title="Остаток"/>
+    </grid>
+
+    <form name="expense-report-form"
+          title="Авансовый отчёт"
+          model="com.example.expense.db.ExpenseReport">
+
+        <panel title="Основные данные">
+            <field name="reportNumber" title="Номер отчёта" colSpan="4" required="true"/>
+            <field name="reportDate" title="Дата" colSpan="4"/>
+            <field name="employeeName" title="ФИО сотрудника" colSpan="6"/>
+            <field name="department" title="Отдел" colSpan="6"/>
+            <field name="advanceAmount" title="Выданный аванс" colSpan="4"/>
+            <field name="totalExpense" title="Итого расходов" colSpan="4" x-readonly="true"/>
+            <field name="difference" title="Остаток/перерасход" colSpan="4" x-readonly="true"/>
+        </panel>
+
+        <panel title="Расходы">
+            <panel-related field="expenses"
+                           title="Расходы"
+                           model="com.example.expense.db.ExpenseReportLine"
+                           editable="true">
+                <field name="expenseDate" title="Дата"
+                       onChange="action-save-expense-line-group"/>
+                <field name="category" title="Категория"
+                       selection="expense.category.select"
+                       onChange="action-save-expense-line-group"/>
+                <field name="description" title="Описание"
+                       onChange="action-save-expense-line-group"/>
+                <field name="documentNumber" title="№ документа"
+                       onChange="action-save-expense-line-group"/>
+                <field name="documentDate" title="Дата документа"
+                       onChange="action-save-expense-line-group"/>
+                <field name="amount" title="Сумма"
+                       onChange="action-save-expense-line-group"/>
+                <field name="currency" title="Валюта"
+                       selection="expense.currency.select"
+                       onChange="action-save-expense-line-group"/>
+                <field name="approved" title="Согласовано"/>
+            </panel-related>
+        </panel>
+
+    </form>
+
+    <selection name="expense.category.select">
+        <option value="TRANSPORT">Транспорт</option>
+        <option value="HOTEL">Гостиница</option>
+        <option value="MEAL">Питание</option>
+        <option value="OTHER">Прочее</option>
+    </selection>
+
+    <selection name="expense.currency.select">
+        <option value="KGS">KGS</option>
+        <option value="USD">USD</option>
+        <option value="RUB">RUB</option>
+    </selection>
+
+    <action-method name="action-save-expense-line">
+        <call class="com.example.expense.web.ExpenseReportController"
+              method="saveExpenseLine"/>
+    </action-method>
+
+    <action-record name="action-reload-expense-report"
+                   model="com.example.expense.db.ExpenseReport">
+        <field name="totalExpense" expr="eval: __repo__(ExpenseReport).find(__id__)?.totalExpense"/>
+        <field name="difference" expr="eval: __repo__(ExpenseReport).find(__id__)?.difference"/>
+    </action-record>
+
+    <action-group name="action-save-expense-line-group">
+        <action name="action-save-expense-line"/>
+        <action name="action-reload-expense-report"/>
+    </action-group>
+
+    <action-view name="action-expense-report-all"
+                 title="Авансовые отчёты"
+                 model="com.example.expense.db.ExpenseReport">
+        <view type="grid" name="expense-report-grid"/>
+        <view type="form" name="expense-report-form"/>
+    </action-view>
+
+    <menuitem name="menu-expense"
+              title="Авансовые отчёты"
+              icon="fa-money"
+              order="210"/>
+
+    <menuitem name="menu-expense-reports"
+              title="Отчёты"
+              parent="menu-expense"
+              action="action-expense-report-all"
+              order="10"/>
+
+</object-views>

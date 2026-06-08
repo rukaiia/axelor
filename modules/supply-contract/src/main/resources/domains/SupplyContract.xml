@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models
+    xmlns="http://axelor.com/xml/ns/domain-models"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+        https://axelor.com/xml/ns/domain-models/domain-models_5.4.xsd">
+
+    <module name="supply-contract" package="com.example.supply.db"/>
+
+    <entity name="SupplyContract">
+        <string name="contractNumber" title="Номер договора" required="true" max="50"/>
+        <date name="contractDate" title="Дата заключения"/>
+        <string name="supplierName" title="Поставщик" max="200"/>
+        <string name="buyerName" title="Покупатель" max="200"/>
+        <decimal name="totalAmount" title="Итоговая сумма" scale="2" precision="20"/>
+        <string name="status" title="Статус" max="20" default="DRAFT"/>
+        <one-to-many name="lines" title="Позиции"
+                     ref="SupplyContractLine"
+                     mappedBy="contract"/>
+    </entity>
+
+    <entity name="SupplyContractLine">
+        <many-to-one name="contract" title="Договор" ref="SupplyContract"/>
+        <integer name="lineNumber" title="№"/>
+        <string name="productCode" title="Код товара" max="50"/>
+        <string name="productName" title="Наименование товара" max="200"/>
+        <decimal name="quantity" title="Количество" scale="3" precision="20"/>
+        <decimal name="unitPrice" title="Цена за единицу" scale="2" precision="20"/>
+        <decimal name="totalPrice" title="Сумма" scale="2" precision="20"/>
+        <string name="unit" title="Единица измерения" max="20"/>
+    </entity>
+
+</domain-models>

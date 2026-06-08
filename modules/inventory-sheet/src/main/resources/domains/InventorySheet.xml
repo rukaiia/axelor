@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models
+    xmlns="http://axelor.com/xml/ns/domain-models"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+        https://axelor.com/xml/ns/domain-models/domain-models_5.4.xsd">
+
+    <module name="inventory-sheet" package="com.example.inventory.db"/>
+
+    <entity name="InventorySheet">
+        <string name="sheetNumber" title="Номер ведомости" required="true" max="50"/>
+        <date name="inventoryDate" title="Дата инвентаризации"/>
+        <string name="warehouseName" title="Наименование склада" max="200"/>
+        <string name="warehouseCode" title="Код склада" max="50"/>
+        <string name="responsiblePerson" title="МОЛ" max="200"/>
+        <decimal name="totalVariance" title="Итоговое отклонение" scale="2" precision="20"/>
+        <string name="status" title="Статус" max="20" default="DRAFT"/>
+        <one-to-many name="lines" title="Позиции"
+                     ref="InventorySheetLine"
+                     mappedBy="sheet"/>
+    </entity>
+
+    <entity name="InventorySheetLine">
+        <many-to-one name="sheet" title="Ведомость" ref="InventorySheet"/>
+        <string name="articleNumber" title="Артикул" max="50"/>
+        <string name="productName" title="Наименование товара" max="200"/>
+        <string name="unit" title="Единица измерения" max="20"/>
+        <decimal name="plannedQty" title="Кол-во по учёту" scale="3" precision="20"/>
+        <decimal name="actualQty" title="Фактическое кол-во" scale="3" precision="20"/>
+        <decimal name="variance" title="Отклонение" scale="3" precision="36"/>
+        <decimal name="unitCost" title="Стоимость за единицу" scale="2" precision="20"/>
+        <decimal name="varianceAmount" title="Сумма отклонения" scale="2" precision="36"/>
+        <string name="note" title="Примечание" max="500"/>
+    </entity>
+
+</domain-models>

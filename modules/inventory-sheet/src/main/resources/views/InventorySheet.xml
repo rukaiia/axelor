@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views
+        xmlns="http://axelor.com/xml/ns/object-views"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+        https://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+
+    <grid name="inventory-sheet-grid"
+          title="Инвентаризационные ведомости"
+          model="com.example.inventory.db.InventorySheet"
+          orderBy="-inventoryDate">
+        <field name="sheetNumber" title="Номер"/>
+        <field name="inventoryDate" title="Дата"/>
+        <field name="warehouseName" title="Склад"/>
+        <field name="responsiblePerson" title="МОЛ"/>
+        <field name="totalVariance" title="Отклонение"/>
+        <field name="status" title="Статус"/>
+    </grid>
+
+    <form name="inventory-sheet-form"
+          title="Инвентаризационная ведомость"
+          model="com.example.inventory.db.InventorySheet">
+
+        <panel title="Основные данные">
+            <field name="sheetNumber" title="Номер ведомости" colSpan="4" required="true"/>
+            <field name="inventoryDate" title="Дата" colSpan="4"/>
+            <field name="status" title="Статус" colSpan="4"
+                   selection="inventory.status.select"/>
+            <field name="warehouseName" title="Наименование склада" colSpan="6"/>
+            <field name="warehouseCode" title="Код склада" colSpan="3"/>
+            <field name="responsiblePerson" title="МОЛ" colSpan="6"/>
+            <!-- x-readonly вместо readonly — чтобы action-record мог обновить значение -->
+            <field name="totalVariance" title="Итоговое отклонение" colSpan="4" x-readonly="true"/>
+        </panel>
+
+        <panel title="Позиции товаров">
+            <panel-related field="lines"
+                           title="Позиции"
+                           model="com.example.inventory.db.InventorySheetLine"
+                           editable="true"
+                           edit-window="popup">
+                <field name="articleNumber" title="Артикул"
+                       onChange="action-save-inventory-line-group"/>
+                <field name="productName" title="Наименование"
+                       onChange="action-save-inventory-line-group"/>
+                <field name="unit" title="Ед.изм."
+                       onChange="action-save-inventory-line-group"/>
+                <field name="plannedQty" title="По учёту"
+                       onChange="action-save-inventory-line-group"/>
+                <field name="actualQty" title="Фактически"
+                       onChange="action-save-inventory-line-group"/>
+                <!-- x-readonly — чтобы response.setValue из сервиса дошло до UI -->
+                <field name="variance" title="Отклонение" x-readonly="true"/>
+                <field name="unitCost" title="Стоимость"
+                       onChange="action-save-inventory-line-group"/>
+                <field name="varianceAmount" title="Сумма откл." x-readonly="true"/>
+                <field name="note" title="Примечание"
+                       onChange="action-save-inventory-line-group"/>
+            </panel-related>
+        </panel>
+
+    </form>
+
+    <selection name="inventory.status.select">
+        <option value="DRAFT">Черновик</option>
+        <option value="IN_PROGRESS">В процессе</option>
+        <option value="COMPLETED">Завершена</option>
+    </selection>
+
+    <action-method name="action-save-inventory-line">
+        <call class="com.example.inventory.web.InventorySheetController"
+              method="saveInventoryLine"/>
+    </action-method>
+
+    <!-- Перечитывает totalVariance у родителя после сохранения строки -->
+    <action-record name="action-reload-inventory-sheet"
+                   model="com.example.inventory.db.InventorySheet">
+        <field name="totalVariance" expr="eval: __repo__(InventorySheet).find(__id__)?.totalVariance"/>
+    </action-record>
+
+    <action-group name="action-save-inventory-line-group">
+        <action name="action-save-inventory-line"/>
+        <action name="action-reload-inventory-sheet"/>
+    </action-group>
+
+    <action-view name="action-inventory-sheet-all"
+                 title="Инвентаризационные ведомости"
+                 model="com.example.inventory.db.InventorySheet">
+        <view type="grid" name="inventory-sheet-grid"/>
+        <view type="form" name="inventory-sheet-form"/>
+    </action-view>
+
+    <menuitem name="menu-inventory"
+              title="Инвентаризация"
+              icon="fa-list-alt"
+              order="220"/>
+
+    <menuitem name="menu-inventory-sheets"
+              title="Ведомости"
+              parent="menu-inventory"
+              action="action-inventory-sheet-all"
+              order="10"/>
+
+</object-views>

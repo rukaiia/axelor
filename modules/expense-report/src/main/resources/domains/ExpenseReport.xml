@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain-models
+    xmlns="http://axelor.com/xml/ns/domain-models"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://axelor.com/xml/ns/domain-models
+        https://axelor.com/xml/ns/domain-models/domain-models_5.4.xsd">
+
+    <module name="expense-report" package="com.example.expense.db"/>
+
+    <entity name="ExpenseReport">
+        <string name="reportNumber" title="Номер отчёта" required="true" max="50"/>
+        <date name="reportDate" title="Дата составления"/>
+        <string name="employeeName" title="ФИО сотрудника" max="200"/>
+        <string name="department" title="Отдел" max="100"/>
+        <decimal name="advanceAmount" title="Выданный аванс" scale="2" precision="20"/>
+        <decimal name="totalExpense" title="Итого расходов" scale="2" precision="20"/>
+        <decimal name="difference" title="Остаток/перерасход" scale="2" precision="20"/>
+        <one-to-many name="expenses" title="Расходы"
+                     ref="ExpenseReportLine"
+                     mappedBy="report"/>
+    </entity>
+
+    <entity name="ExpenseReportLine">
+        <many-to-one name="report" title="Отчёт" ref="ExpenseReport"/>
+        <date name="expenseDate" title="Дата расхода"/>
+        <string name="category" title="Категория" max="20"/>
+        <string name="description" title="Описание" max="500"/>
+        <string name="documentNumber" title="Номер документа" max="50"/>
+        <date name="documentDate" title="Дата документа"/>
+        <decimal name="amount" title="Сумма" scale="2" precision="20"/>
+        <string name="currency" title="Валюта" max="10" default="KGS"/>
+        <boolean name="approved" title="Согласовано"/>
+    </entity>
+
+</domain-models>

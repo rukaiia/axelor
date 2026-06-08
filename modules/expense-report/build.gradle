@@ -1,0 +1,6 @@
+apply plugin: 'com.axelor.app'
+
+axelor {
+    title = 'Expense Report'
+    description = 'Expense Report with OneToMany lines and onchange'
+}

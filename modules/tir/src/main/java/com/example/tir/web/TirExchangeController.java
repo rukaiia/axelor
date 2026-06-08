@@ -57,6 +57,7 @@ public class TirExchangeController {
             String iruReference = (String) request.getContext().get("iruReference");
             String customsIndex = (String) request.getContext().get("customsIndex");
 
+
             if (messageType == null || messageType.isEmpty()) {
                 response.setError("Выберите тип сообщения");
                 return;

@@ -1,0 +1,6 @@
+apply plugin: 'com.axelor.app'
+
+axelor {
+    title = 'Supply Contract'
+    description = 'Supply Contract with OneToMany lines and onchange'
+}

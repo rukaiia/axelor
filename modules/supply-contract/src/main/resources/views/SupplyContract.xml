@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<object-views
+        xmlns="http://axelor.com/xml/ns/object-views"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://axelor.com/xml/ns/object-views
+        https://axelor.com/xml/ns/object-views/object-views_5.4.xsd">
+
+    <grid name="supply-contract-grid"
+          title="Договоры поставки"
+          model="com.example.supply.db.SupplyContract"
+          orderBy="-contractDate">
+        <field name="contractNumber" title="Номер"/>
+        <field name="contractDate" title="Дата"/>
+        <field name="supplierName" title="Поставщик"/>
+        <field name="buyerName" title="Покупатель"/>
+        <field name="totalAmount" title="Сумма"/>
+        <field name="status" title="Статус"/>
+    </grid>
+
+    <form name="supply-contract-form"
+          title="Договор поставки"
+          model="com.example.supply.db.SupplyContract">
+
+        <panel title="Основные данные">
+            <field name="contractNumber" title="Номер договора" colSpan="4" required="true"/>
+            <field name="contractDate" title="Дата" colSpan="4"/>
+            <field name="status" title="Статус" colSpan="4"
+                   selection="supply.contract.status.select"/>
+            <field name="supplierName" title="Поставщик" colSpan="6"/>
+            <field name="buyerName" title="Покупатель" colSpan="6"/>
+            <!-- x-readonly вместо readonly — чтобы action-record мог обновить значение -->
+            <field name="totalAmount" title="Итоговая сумма" colSpan="4" x-readonly="true"/>
+        </panel>
+
+        <panel title="Позиции товаров">
+            <panel-related field="lines"
+                           title="Позиции"
+                           model="com.example.supply.db.SupplyContractLine"
+                           editable="true"
+                           edit-window="popup">
+                <field name="lineNumber" title="№" width="50"/>
+                <field name="productCode" title="Код товара"
+                       onChange="action-save-contract-line-group"/>
+                <field name="productName" title="Наименование"
+                       onChange="action-save-contract-line-group"/>
+                <field name="quantity" title="Кол-во"
+                       onChange="action-save-contract-line-group"/>
+                <field name="unit" title="Ед.изм."
+                       onChange="action-save-contract-line-group"/>
+                <field name="unitPrice" title="Цена"
+                       onChange="action-save-contract-line-group"/>
+                <!-- x-readonly — чтобы response.setValue("totalPrice") из сервиса дошло до UI -->
+                <field name="totalPrice" title="Сумма" x-readonly="true"/>
+            </panel-related>
+        </panel>
+
+    </form>
+
+    <selection name="supply.contract.status.select">
+        <option value="DRAFT">Черновик</option>
+        <option value="ACTIVE">Активный</option>
+        <option value="CLOSED">Закрыт</option>
+    </selection>
+
+    <action-method name="action-save-contract-line">
+        <call class="com.example.supply.web.SupplyContractController"
+              method="saveContractLine"/>
+    </action-method>
+
+    <!-- Перечитывает totalAmount у родителя после сохранения строки -->
+    <action-record name="action-reload-supply-contract"
+                   model="com.example.supply.db.SupplyContract">
+        <field name="totalAmount" expr="eval: __repo__(SupplyContract).find(__id__)?.totalAmount"/>
+    </action-record>
+
+    <action-group name="action-save-contract-line-group">
+        <action name="action-save-contract-line"/>
+        <action name="action-reload-supply-contract"/>
+    </action-group>
+
+    <action-view name="action-supply-contract-all"
+                 title="Договоры поставки"
+                 model="com.example.supply.db.SupplyContract">
+        <view type="grid" name="supply-contract-grid"/>
+        <view type="form" name="supply-contract-form"/>
+    </action-view>
+
+    <menuitem name="menu-supply"
+              title="Договоры поставки"
+              icon="fa-file-text"
+              order="200"/>
+
+    <menuitem name="menu-supply-contracts"
+              title="Договоры"
+              parent="menu-supply"
+              action="action-supply-contract-all"
+              order="10"/>
+
+</object-views>
